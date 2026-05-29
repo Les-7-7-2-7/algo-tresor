@@ -45,6 +45,14 @@ public class Game {
         items.put(item.getId(), item);
     }
 
+	public boolean containsItem(int id) {
+		return items.containsKey(id);
+	}
+
+	public boolean containsItem(Item item) {
+		return items.containsKey(item.getId());
+	}
+
     public Collection<Item> getAvailableItems() {
         return items.values();
     }
