@@ -57,6 +57,14 @@ public class Game {
 		return weightCapacity;
 	}
 
+	public int getRemainingWeight() {
+		return weightCapacity - currentWeight;
+	}
+
+	public int getRemainingSize() {
+		return sizeCapacity - currentSize;
+	}
+
 	public int getCurrentSize() {
 		return currentSize;
 	}
