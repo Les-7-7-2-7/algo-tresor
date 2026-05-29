@@ -16,11 +16,16 @@ public class GreedyStrategy implements Strategy {
 	private static class ItemWithValue {
 		private final Item item;
 		private final double baseValue;
+		private boolean isTarget = false;
 
 		public ItemWithValue(Item item, double c_size, double c_weight) {
 			this.item = item;
 			// Correction de la priorité des opérateurs avec double parenthèse
 			this.baseValue = item.getCost() / ((c_size * item.getSize()) + (c_weight * item.getWeight()));
+		}
+
+		public void setTarget(boolean val) {
+			isTarget = val;
 		}
 
 		public Item getItem() {
@@ -77,19 +82,40 @@ public class GreedyStrategy implements Strategy {
 	@Override
 	public void preprocess(Game game) {
 		long totalSize = 0,
-			totalWeight = 0;
+				totalWeight = 0;
 
 		for (Item item : game.getAvailableItems()) {
 			totalSize += item.getSize();
 			totalWeight += item.getWeight();
 		}
 
-		double c_size = totalSize / (double)game.getSizeCapacity(),
-			c_weight = totalWeight / (double)game.getWeightCapacity();
+		double c_size = totalSize / (double) game.getSizeCapacity(),
+				c_weight = totalWeight / (double) game.getWeightCapacity();
 
 		items = game.getAvailableItems().stream()
 				.map(item -> new ItemWithValue(item, c_size, c_weight))
 				.sorted(Comparator.comparingDouble(ItemWithValue::getBaseValue).reversed())
 				.toList();
+
+		// Simulation
+
+		long virtualSize = 0,
+			virtualWeight = 0;
+
+		for (ItemWithValue item_val : items) {
+			Item item = item_val.getItem();
+			int size, weight;
+
+			size = item.getSize();
+			weight = item.getWeight();
+
+			boolean fits = (virtualSize + size <= game.getSizeCapacity()) && (virtualWeight + weight <= game.getWeightCapacity());
+
+			if (fits) {
+				item_val.setTarget(true);
+				virtualSize += size;
+				virtualWeight += weight;
+			}
+		}
 	}
 }
