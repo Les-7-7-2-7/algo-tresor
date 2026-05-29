@@ -5,10 +5,9 @@ import dev.bastienluben.algotresor.structs.Item;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
 /**
- * Stratégie simple, on prends le meilleur a chaque tour
+ * Stratégie gloutonne dynamique avec déni de ressources (blocage).
  */
 public class GreedyStrategy implements Strategy {
 
@@ -16,19 +15,20 @@ public class GreedyStrategy implements Strategy {
 
 	private static class ItemWithValue {
 		private final Item item;
-		private final double value;
+		private final double baseValue;
 
 		public ItemWithValue(Item item, double c_size, double c_weight) {
 			this.item = item;
-			this.value = item.getCost() /  ((c_size * (double)item.getSize()) + (c_weight * (double)item.getWeight()));
+			// Correction de la priorité des opérateurs avec double parenthèse
+			this.baseValue = item.getCost() / ((c_size * item.getSize()) + (c_weight * item.getWeight()));
 		}
 
 		public Item getItem() {
 			return item;
 		}
 
-		public double getValue() {
-			return value;
+		public double getBaseValue() {
+			return baseValue;
 		}
 	}
 
@@ -36,15 +36,38 @@ public class GreedyStrategy implements Strategy {
 	public int pickItem(Game game) {
 		int output = -1;
 
+		int opponentRemainingSize = game.getSizeCapacity();
+		int opponentRemainingWeight = game.getWeightCapacity();
+
+		for (Item oppItem : game.getOpponentItems()) {
+			opponentRemainingSize -= oppItem.getSize();
+			opponentRemainingWeight -= oppItem.getWeight();
+		}
+
+		double bestScore = -1.0;
+
 		for (ItemWithValue itemWithValue : items) {
 			Item item = itemWithValue.getItem();
-			boolean available = game.containsItem(item.getId());
-			boolean fits_in = game.getRemainingSize() >= item.getSize() &&
-					game.getRemainingWeight() >= item.getWeight();
 
-			if (available && fits_in) {
-				output = item.getId();
-				break;
+			if (game.containsItem(item.getId())) {
+				boolean fitsInMe = game.getRemainingSize() >= item.getSize() &&
+						game.getRemainingWeight() >= item.getWeight();
+
+				if (fitsInMe) {
+					double currentScore = itemWithValue.getBaseValue();
+
+					boolean fitsInOpponent = opponentRemainingSize >= item.getSize() &&
+							opponentRemainingWeight >= item.getWeight();
+
+					if (fitsInOpponent) {
+						currentScore += (itemWithValue.getBaseValue() * 0.5);
+					}
+
+					if (currentScore > bestScore) {
+						bestScore = currentScore;
+						output = item.getId();
+					}
+				}
 			}
 		}
 
@@ -66,7 +89,7 @@ public class GreedyStrategy implements Strategy {
 
 		items = game.getAvailableItems().stream()
 				.map(item -> new ItemWithValue(item, c_size, c_weight))
-				.sorted(Comparator.comparingDouble(ItemWithValue::getValue).reversed())
+				.sorted(Comparator.comparingDouble(ItemWithValue::getBaseValue).reversed())
 				.toList();
 	}
 }
