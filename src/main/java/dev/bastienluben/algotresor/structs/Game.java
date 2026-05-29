@@ -56,12 +56,23 @@ public class Game {
 	}
 
 	public int pickItem() {
-		int chosen = strategy.pickItem(this);
-		if (chosen != -1) {
-			Item item = items.remove(chosen);
-			currentSize += item.getSize();
-			currentWeight += item.getWeight();
+		int chosenId = -1;
+		int proposedId = this.strategy.pickItem(this);
+
+		if (proposedId != -1) {
+			Item item = this.items.get(proposedId);
+
+			if (item != null
+					&& (this.currentWeight + item.getWeight()) <= this.weightCapacity
+					&& (this.currentSize + item.getSize()) <= this.sizeCapacity) {
+
+				chosenId = proposedId;
+				this.items.remove(chosenId);
+				this.currentSize += item.getSize();
+				this.currentWeight += item.getWeight();
+			}
 		}
-		return chosen;
+
+		return chosenId;
 	}
 }
