@@ -28,6 +28,10 @@ public class GreedyStrategy implements Strategy {
 			isTarget = val;
 		}
 
+		public boolean isTarget() {
+			return isTarget;
+		}
+
 		public Item getItem() {
 			return item;
 		}
@@ -50,6 +54,7 @@ public class GreedyStrategy implements Strategy {
 		}
 
 		double bestScore = -1.0;
+		int evaluatedCount = 0;
 
 		for (ItemWithValue itemWithValue : items) {
 			Item item = itemWithValue.getItem();
@@ -61,6 +66,10 @@ public class GreedyStrategy implements Strategy {
 				if (fitsInMe) {
 					double currentScore = itemWithValue.getBaseValue();
 
+					if (itemWithValue.isTarget()) {
+						currentScore += (itemWithValue.getBaseValue() * 0.3);
+					}
+
 					boolean fitsInOpponent = opponentRemainingSize >= item.getSize() &&
 							opponentRemainingWeight >= item.getWeight();
 
@@ -71,6 +80,11 @@ public class GreedyStrategy implements Strategy {
 					if (currentScore > bestScore) {
 						bestScore = currentScore;
 						output = item.getId();
+					}
+
+					evaluatedCount++;
+					if (evaluatedCount == 5) {
+						break;
 					}
 				}
 			}
@@ -100,7 +114,7 @@ public class GreedyStrategy implements Strategy {
 		// Simulation
 
 		long virtualSize = 0,
-			virtualWeight = 0;
+				virtualWeight = 0;
 
 		for (ItemWithValue item_val : items) {
 			Item item = item_val.getItem();
@@ -109,7 +123,8 @@ public class GreedyStrategy implements Strategy {
 			size = item.getSize();
 			weight = item.getWeight();
 
-			boolean fits = (virtualSize + size <= game.getSizeCapacity()) && (virtualWeight + weight <= game.getWeightCapacity());
+			boolean fits = (virtualSize + size <= game.getSizeCapacity())
+					&& (virtualWeight + weight <= game.getWeightCapacity());
 
 			if (fits) {
 				item_val.setTarget(true);
