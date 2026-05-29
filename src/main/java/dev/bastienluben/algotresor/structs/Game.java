@@ -93,14 +93,6 @@ public class Game {
         return turnNumber;
     }
 
-    public int getRemainingSize() {
-        return sizeCapacity - currentSize;
-    }
-
-    public int getRemainingWeight() {
-        return weightCapacity - currentWeight;
-    }
-
     public List<Item> getMyItems() {
         return myItems;
     }
