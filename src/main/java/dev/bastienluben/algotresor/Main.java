@@ -1,6 +1,6 @@
 package dev.bastienluben.algotresor;
 
-import dev.bastienluben.algotresor.strategy.PassStrategy;
+import dev.bastienluben.algotresor.strategy.GreedyStrategy;
 import dev.bastienluben.algotresor.structs.Game;
 import dev.bastienluben.algotresor.structs.Item;
 
@@ -20,7 +20,7 @@ public class Main {
 		scanner.next(); // "weight_capacity"
 		int weightCapacity = scanner.nextInt();
 
-		Game game = new Game(n, sizeCapacity, weightCapacity, new PassStrategy());
+		Game game = new Game(n, sizeCapacity, weightCapacity, new GreedyStrategy());
 
 		// Remplissage des objets sans allocation de String intermédiaire
 		for (int i = 0; i < n; i++) {
