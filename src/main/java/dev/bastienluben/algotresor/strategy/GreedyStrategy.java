@@ -18,9 +18,9 @@ public class GreedyStrategy implements Strategy {
 		private final Item item;
 		private final double value;
 
-		public ItemWithValue(Item item) {
+		public ItemWithValue(Item item, double c_size, double c_weight) {
 			this.item = item;
-			this.value = item.getCost() / (double) (item.getSize() + item.getWeight());
+			this.value = item.getCost() /  ((c_size * (double)item.getSize()) + (c_weight * (double)item.getWeight()));
 		}
 
 		public Item getItem() {
@@ -53,8 +53,19 @@ public class GreedyStrategy implements Strategy {
 
 	@Override
 	public void preprocess(Game game) {
+		long totalSize = 0,
+			totalWeight = 0;
+
+		for (Item item : game.getAvailableItems()) {
+			totalSize += item.getSize();
+			totalWeight += item.getWeight();
+		}
+
+		double c_size = totalSize / (double)game.getSizeCapacity(),
+			c_weight = totalWeight / (double)game.getWeightCapacity();
+
 		items = game.getAvailableItems().stream()
-				.map(ItemWithValue::new)
+				.map(item -> new ItemWithValue(item, c_size, c_weight))
 				.sorted(Comparator.comparingDouble(ItemWithValue::getValue).reversed())
 				.toList();
 	}
