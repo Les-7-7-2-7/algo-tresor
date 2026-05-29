@@ -2,6 +2,7 @@ package dev.bastienluben.algotresor.structs;
 
 import dev.bastienluben.algotresor.strategy.Strategy;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,8 +27,28 @@ public class Game {
         items.put(item.getId(), item);
     }
 
+    public Collection<Item> getAvailableItems() {
+        return items.values();
+    }
+
+    public int getSizeCapacity() {
+        return sizeCapacity;
+    }
+
+    public int getWeightCapacity() {
+        return weightCapacity;
+    }
+
+    public int getCurrentSize() {
+        return currentSize;
+    }
+
+    public int getCurrentWeight() {
+        return currentWeight;
+    }
+
     public void preprocess() {
-        strategy.preprocess(items.values(), sizeCapacity, weightCapacity);
+        strategy.preprocess(this);
     }
 
     public void opponentTook(int id) {
@@ -35,7 +56,7 @@ public class Game {
     }
 
     public int pickItem() {
-        int chosen = strategy.pickItem(items.values(), currentSize, currentWeight);
+        int chosen = strategy.pickItem(this);
         if (chosen != -1) {
             Item item = items.remove(chosen);
             currentSize += item.getSize();

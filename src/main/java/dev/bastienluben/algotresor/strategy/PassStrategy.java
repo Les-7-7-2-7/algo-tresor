@@ -1,17 +1,15 @@
 package dev.bastienluben.algotresor.strategy;
 
-import dev.bastienluben.algotresor.structs.Item;
-
-import java.util.Collection;
+import dev.bastienluben.algotresor.structs.Game;
 
 public class PassStrategy implements Strategy {
 
     @Override
-    public void preprocess(Collection<Item> items, int sizeCapacity, int weightCapacity) {
+    public void preprocess(Game game) {
     }
 
     @Override
-    public int pickItem(Collection<Item> availableItems, int currentSize, int currentWeight) {
+    public int pickItem(Game game) {
         return -1;
     }
 }
