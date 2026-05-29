@@ -1,5 +1,6 @@
 package dev.bastienluben.algotresor;
 
+import dev.bastienluben.algotresor.strategy.PassStrategy;
 import dev.bastienluben.algotresor.structs.Game;
 import dev.bastienluben.algotresor.structs.Item;
 
@@ -13,7 +14,7 @@ public class Main {
         int sizeCapacity = Integer.parseInt(scanner.nextLine().split(" ")[1]);
         int weightCapacity = Integer.parseInt(scanner.nextLine().split(" ")[1]);
 
-        Game game = new Game(n, sizeCapacity, weightCapacity);
+        Game game = new Game(n, sizeCapacity, weightCapacity, new PassStrategy());
 
         for (int i = 0; i < n; i++) {
             game.addItem(Item.fromString(scanner.nextLine()));
