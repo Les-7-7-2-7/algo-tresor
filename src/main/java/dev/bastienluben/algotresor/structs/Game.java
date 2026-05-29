@@ -9,10 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 public class Game {
-    private static final String RESET  = "[0m";
-    private static final String CYAN   = "[36m";
-    private static final String GREEN  = "[32m";
-    private static final String RED    = "[31m";
+    private static final String RESET = "[0m";
+    private static final String CYAN = "[36m";
+    private static final String GREEN = "[32m";
+    private static final String RED = "[31m";
     private static final String YELLOW = "[33m";
 
     private final Map<Integer, Item> items;
@@ -98,11 +98,13 @@ public class Game {
     }
 
     public void preprocess() {
-        System.err.println(CYAN + "[preprocess] " + items.size() + " items, sizeCapacity=" + sizeCapacity + ", weightCapacity=" + weightCapacity + RESET);
+        System.err.println(CYAN + "[preprocess] " + items.size() + " items, sizeCapacity=" + sizeCapacity
+                + ", weightCapacity=" + weightCapacity + RESET);
         long start = System.nanoTime();
         strategy.preprocess(this);
         long elapsedMs = (System.nanoTime() - start) / 1_000_000;
-        System.err.println(CYAN + "[preprocess] done — " + elapsedMs + "ms elapsed, " + (5000 - elapsedMs) + "ms remaining" + RESET);
+        System.err.println(CYAN + "[preprocess] done — " + elapsedMs + "ms elapsed, " + (5000 - elapsedMs)
+                + "ms remaining" + RESET);
     }
 
     public List<Item> getOpponentItems() {
@@ -119,35 +121,27 @@ public class Game {
         if (item != null) {
             opponentItems.add(item);
             opponentScore += item.getCost();
-            System.err.println(RED + "[opponent] took item " + id + " (size=" + item.getSize() + ", weight=" + item.getWeight() + ", value=" + item.getCost() + ")" + RESET);
+            System.err.println(RED + "[opponent] took item " + id + " (size=" + item.getSize() + ", weight="
+                    + item.getWeight() + ", value=" + item.getCost() + ")" + RESET);
         }
     }
 
     public int pickItem() {
         long start = System.nanoTime();
+
         int chosen = strategy.pickItem(this);
         long elapsedMs = (System.nanoTime() - start) / 1_000_000;
-        System.err.println(CYAN + "[pick] strategy took " + elapsedMs + "ms, " + (500 - elapsedMs) + "ms remaining" + RESET);
-        if (chosen == -1) {
+
+        if (chosen != -1) {
+            Item item = items.remove(chosen);
+            currentSize += item.getSize();
+            currentWeight += item.getWeight();
+            System.err.println(GREEN + "[pick] took item " + chosen + " (size=" + item.getSize() + ", weight="
+                    + item.getWeight() + ", value=" + item.getCost() + ") | bag: size=" + currentSize + "/"
+                    + sizeCapacity + ", weight=" + currentWeight + "/" + weightCapacity + RESET);
+        } else {
             System.err.println(YELLOW + "[pick] passing" + RESET);
-            return -1;
         }
-        Item item = items.get(chosen);
-        if (item == null) {
-            System.err.println(YELLOW + "[pick] invalid id=" + chosen + ", passing" + RESET);
-            return -1;
-        }
-        if (currentSize + item.getSize() > sizeCapacity || currentWeight + item.getWeight() > weightCapacity) {
-            System.err.println(YELLOW + "[pick] item " + chosen + " exceeds capacity (size=" + (currentSize + item.getSize()) + "/" + sizeCapacity + ", weight=" + (currentWeight + item.getWeight()) + "/" + weightCapacity + "), passing" + RESET);
-            return -1;
-        }
-        items.remove(chosen);
-        myItems.add(item);
-        currentSize += item.getSize();
-        currentWeight += item.getWeight();
-        currentScore += item.getCost();
-        turnNumber++;
-        System.err.println(GREEN + "[pick] took item " + chosen + " (size=" + item.getSize() + ", weight=" + item.getWeight() + ", value=" + item.getCost() + ") | bag: size=" + currentSize + "/" + sizeCapacity + ", weight=" + currentWeight + "/" + weightCapacity + RESET);
         return chosen;
     }
 }

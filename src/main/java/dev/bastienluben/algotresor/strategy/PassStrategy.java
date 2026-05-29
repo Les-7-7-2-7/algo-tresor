@@ -4,12 +4,12 @@ import dev.bastienluben.algotresor.structs.Game;
 
 public class PassStrategy implements Strategy {
 
-    @Override
-    public void preprocess(Game game) {
-    }
+	@Override
+	public void preprocess(Game game) {
+	}
 
-    @Override
-    public int pickItem(Game game) {
-        return -1;
-    }
+	@Override
+	public int pickItem(Game game) {
+		return -1;
+	}
 }
