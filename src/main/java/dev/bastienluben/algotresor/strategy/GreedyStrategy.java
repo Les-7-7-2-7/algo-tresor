@@ -53,6 +53,12 @@ public class GreedyStrategy implements Strategy {
 			opponentRemainingWeight -= oppItem.getWeight();
 		}
 
+		double oppSizeRatio = 1.0 - (opponentRemainingSize / (double) game.getSizeCapacity());
+		double oppWeightRatio = 1.0 - (opponentRemainingWeight / (double) game.getWeightCapacity());
+		double opponentUrgency = Math.max(oppSizeRatio, oppWeightRatio);
+
+		double adaptiveDenialBonus = 0.3 + (opponentUrgency * 1.2);
+
 		double bestScore = -1.0;
 		int evaluatedCount = 0;
 
@@ -74,7 +80,7 @@ public class GreedyStrategy implements Strategy {
 							opponentRemainingWeight >= item.getWeight();
 
 					if (fitsInOpponent) {
-						currentScore += (itemWithValue.getBaseValue() * 0.5);
+						currentScore += (itemWithValue.getBaseValue() * adaptiveDenialBonus);
 					}
 
 					if (currentScore > bestScore) {
