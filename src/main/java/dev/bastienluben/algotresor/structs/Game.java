@@ -129,19 +129,30 @@ public class Game {
     public int pickItem() {
         long start = System.nanoTime();
 
-        int chosen = strategy.pickItem(this);
+        int chosenId = -1;
+		int proposedId = this.strategy.pickItem(this);
         long elapsedMs = (System.nanoTime() - start) / 1_000_000;
 
-        if (chosen != -1) {
-            Item item = items.remove(chosen);
-            currentSize += item.getSize();
-            currentWeight += item.getWeight();
-            System.err.println(GREEN + "[pick] took item " + chosen + " (size=" + item.getSize() + ", weight="
+
+        if (proposedId != -1) {
+            Item item = this.items.get(proposedId);
+
+			if (item != null
+					&& (this.currentWeight + item.getWeight()) <= this.weightCapacity
+					&& (this.currentSize + item.getSize()) <= this.sizeCapacity) {
+
+				chosenId = proposedId;
+				this.items.remove(chosenId);
+            	this.currentSize += item.getSize();
+            	this.currentWeight += item.getWeight();
+            System.err.println(GREEN + "[pick] took item " + proposedId + " (size=" + item.getSize() + ", weight="
                     + item.getWeight() + ", value=" + item.getCost() + ") | bag: size=" + currentSize + "/"
                     + sizeCapacity + ", weight=" + currentWeight + "/" + weightCapacity + RESET);
         } else {
             System.err.println(YELLOW + "[pick] passing" + RESET);
-        }
-        return chosen;
+	        }
+		}
+
+        return chosenId;
     }
 }
